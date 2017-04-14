@@ -3,6 +3,7 @@ package passProtect;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,19 +82,13 @@ public class UserManager {
 		List<UserManager> masterFile = new LinkedList<>();
 		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
 			while (reader.hasNextLine()) {
-				String[] data = reader.nextLine().split("\t");
-				masterFile.add(new UserManager(data[0], data[1]));				
-			}
-		}
-		for (UserManager u : masterFile) {
-			System.out.println("U: " + u.getUserName() +" " + u.getUserPass());
-			System.out.println("this: " + this.getUserName() +" and " + this.getUserPass());
-			if (u.getUserName().equals(this.getUserName())) {				
-				if (u.getUserPass().equals(this.getUserPass())) {
-					return true;
+				String[] data = reader.nextLine().split("\t");				
+				if(data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())){					
+						return true;					
 				}
 			}
 		}
+		
 		return false;
 	}
 
@@ -102,20 +97,41 @@ public class UserManager {
 	 * 
 	 * @return true if the username is available for use
 	 */
-	public boolean isAvailable() {
-		List<UserManager> masterFile = new LinkedList<>();
+	private boolean isAvailable() {		
 		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
 			while (reader.hasNextLine()) {
-				String[] data = reader.nextLine().split("\t");
-				masterFile.add(new UserManager(data[0], data[1]));				
+				String[] data = reader.nextLine().split("\t");				
+				if(data[0].equals(this.getUserName())){					
+						return false;					
+				}
 			}
-		}
-		for (UserManager u : masterFile) {
-			System.out.println(u.getUserName() + " vs " + this.getUserName());
-			if (u.getUserName().equals(this.getUserName())) {
+		}		
+		
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((userPass == null) ? 0 : userPass.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserManager other = (UserManager) obj;
+		if (userPass == null) {
+			if (other.userPass != null)
 				return false;
-			}
-		}
+		} else if (!userPass.equals(other.userPass))
+			return false;
 		return true;
 	}
 
@@ -140,7 +156,7 @@ public class UserManager {
 		return false;
 	}
 
-	public String hashPassword(String pass) {
+	private String hashPassword(String pass) {
 		String hashedPass = "";
 		try {
 			MessageDigest md = MessageDigest.getInstance("SHA-1");
