@@ -24,9 +24,7 @@ public class PassProtectApp extends JFrame {
 	 */
 	public static void main(String[] args) {
 
-		UserManager user = new UserManager("username", "testing");
-		System.out.println("validatePassword()" + user.validatePassword());
-		System.out.println("createUser()" + user.createUser());
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -89,3 +87,4 @@ public class PassProtectApp extends JFrame {
 		panel.add(btnCreateAccount);
 	}
 }
+
