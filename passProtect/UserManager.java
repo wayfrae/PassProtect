@@ -38,7 +38,7 @@ public class UserManager {
 	public UserManager(String user, String pass) {
 		this.userName = user;
 		this.userPass = hashPassword(pass);
-		
+
 	}
 
 	/**
@@ -79,15 +79,16 @@ public class UserManager {
 	 *         in the file.
 	 */
 	public boolean validatePassword() {
-		List<UserManager> masterFile = new LinkedList<>();
-		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
-			while (reader.hasNextLine()) {
-				String[] data = reader.nextLine().split("\t");				
-				if(data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())){					
-						return true;					
+		// List<UserManager> masterFile = new LinkedList<>();
+		
+			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
+				while (reader.hasNextLine()) {
+					String[] data = reader.nextLine().split("\t");
+					if (data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())) {
+						return true;
+					}
 				}
 			}
-		}
 		
 		return false;
 	}
@@ -97,16 +98,16 @@ public class UserManager {
 	 * 
 	 * @return true if the username is available for use
 	 */
-	private boolean isAvailable() {		
+	private boolean isAvailable() {
 		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
 			while (reader.hasNextLine()) {
-				String[] data = reader.nextLine().split("\t");				
-				if(data[0].equals(this.getUserName())){					
-						return false;					
+				String[] data = reader.nextLine().split("\t");
+				if (data[0].equals(this.getUserName())) {
+					return false;
 				}
 			}
-		}		
-		
+		}
+
 		return true;
 	}
 
@@ -138,7 +139,7 @@ public class UserManager {
 	/**
 	 * METHOD createUser adds username and password to the master.txt file
 	 * 
-	 * @return
+	 * @return boolean value of whether the user was created successfully or not
 	 */
 	public boolean createUser() {
 		if (isAvailable()) {
@@ -168,9 +169,50 @@ public class UserManager {
 			hashedPass = sb.toString();
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			e.printStackTrace();
-		} 
+		}
 		return hashedPass;
 
+	}
+
+	/**
+	 * METHOD removeUser removes username and password to the master.txt file
+	 * 
+	 * @return boolean value of whether the user was removed successfully or not
+	 */
+	public boolean removeUser() {
+		if (!isAvailable()) {
+			//System.out.println("Is Not Available!");
+			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
+				while (reader.hasNextLine()) {
+					String[] data = reader.nextLine().split("\t");
+					System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
+					if (!data[0].equals(this.getUserName())) {
+						PrintWriter writerTemp = new PrintWriter(new FileWriter("./src/files/temp.txt"));
+						writerTemp.println(data[0] + "\t" + data[1]);
+						writerTemp.close();
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try (Scanner readerTemp = new Scanner(UserManager.class.getResourceAsStream("/files/temp.txt"))) {
+					while (readerTemp.hasNextLine()) {
+						String data = readerTemp.nextLine();						
+						PrintWriter writer = new PrintWriter(new FileWriter("./src/files/master.txt"));
+						writer.println(data);
+						writer.close();							
+					}
+					return true;
+					
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		return false;
 	}
 
 }
