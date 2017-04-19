@@ -1,8 +1,9 @@
 package passProtect;
 
+import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.BufferedWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
@@ -144,9 +145,9 @@ public class UserManager {
 	public boolean createUser() {
 		if (isAvailable()) {
 			try {
-				PrintWriter writer = new PrintWriter(new FileWriter("./src/files/master.txt", true));
-				writer.println(this.getUserName() + "\t" + this.getUserPass());
-				writer.close();
+				BufferedWriter writer = new BufferedWriter(new FileWriter("./src/files/master.txt", true));
+				writer.write(this.getUserName() + "\t" + this.getUserPass());
+				//writer.close();
 				return true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -183,14 +184,14 @@ public class UserManager {
 		if (!isAvailable()) {
 			//System.out.println("Is Not Available!");
 			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
+				BufferedWriter writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
 				while (reader.hasNextLine()) {
 					String[] data = reader.nextLine().split("\t");
-					System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
-					if (!data[0].equals(this.getUserName())) {
-						PrintWriter writerTemp = new PrintWriter(new FileWriter("./src/files/temp.txt"));
-						writerTemp.println(data[0] + "\t" + data[1]);
-						writerTemp.close();
+					//System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
+					if (!data[0].equals(this.getUserName())) {						
+						writerTemp.write(data[0] + "\t" + data[1] + "\n");
 					}
+					//writerTemp.close();
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -198,12 +199,13 @@ public class UserManager {
 			}
 			
 			try (Scanner readerTemp = new Scanner(UserManager.class.getResourceAsStream("/files/temp.txt"))) {
+				BufferedWriter writer = new BufferedWriter(new FileWriter("./src/files/master.txt"));
 					while (readerTemp.hasNextLine()) {
-						String data = readerTemp.nextLine();						
-						PrintWriter writer = new PrintWriter(new FileWriter("./src/files/master.txt"));
-						writer.println(data);
-						writer.close();							
+						String line = readerTemp.nextLine();
+						System.out.println(line);
+						writer.write(line + "\n");
 					}
+					writer.close();	
 					return true;
 					
 			} catch (IOException e) {
