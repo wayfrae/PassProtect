@@ -1,218 +1,48 @@
-package passProtect;
+package tests;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import static org.junit.Assert.*;
 
-/**
- * CLASS UserManager
- *
- */
-public class UserManager {
-	/** FIELD userName holds the user's login name */
-	private String userName;
-	/** FIELD userPass holds the user's password */
-	private String userPass;
-	/**
-	 * FIELD userFile holds PasswordManager object for retrieving specific user
-	 * data
-	 */
-	private PasswordManager userFile;
+import org.junit.Test;
 
-	List<UserManager> masterFile = new LinkedList<>();
+import passProtect.UserManager;
 
-	/**
-	 * CONSTRUCTOR UserManager Logs the user into the UserManager if the
-	 * username and password match a record on file.
-	 * 
-	 * @param user
-	 * @param pass
-	 */
-	public UserManager(String user, String pass) {
-		this.userName = user;
-		this.userPass = hashPassword(pass);
+public class UserManagerTest {
 
+	@Test
+	public void testHashPasswordOnUserCreation() {
+		UserManager test = new UserManager("username", "testing");
+		UserManager test2 = new UserManager("user", "password");
+		assertEquals("dc724af18fbdd4e59189f5fe768a5f8311527050", test.getUserPass());
+		assertNotEquals(test.getUserPass(), test2.getUserPass());
 	}
 
-	/**
-	 * @return the userName
-	 */
-	public String getUserName() {
-		return this.userName;
-	}
-
-	/**
-	 * @param userName
-	 *            the userName to set
-	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	/**
-	 * @return the userPass
-	 */
-	public String getUserPass() {
-		return this.userPass;
-	}
-
-	/**
-	 * @param userPass
-	 *            the userPass to set
-	 */
-	public void setUserPass(String userPass) {
-		this.userPass = userPass;
-	}
-
-	/**
-	 * METHOD validatePassword verifies that the username and password used to
-	 * create the object match a username and password in the master.txt file
-	 * 
-	 * @return true if the username and password matches a username and password
-	 *         in the file.
-	 */
-	public boolean validatePassword() {
-		// List<UserManager> masterFile = new LinkedList<>();
+	@Test
+	public void testValidatePassword() {
+		UserManager test = new UserManager("username", "testing");
+		test.createUser();
+		assertTrue(test.validatePassword());
 		
-			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
-				while (reader.hasNextLine()) {
-					String[] data = reader.nextLine().split("\t");
-					if (data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())) {
-						return true;
-					}
-				}
-			}
+		UserManager test2 = new UserManager("username", "Testing");
+		assertFalse(test2.validatePassword());
 		
-		return false;
 	}
-
-	/**
-	 * METHOD isAvailable verifies that the username has not already been used
-	 * 
-	 * @return true if the username is available for use
-	 */
-	private boolean isAvailable() {
-		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
-			while (reader.hasNextLine()) {
-				String[] data = reader.nextLine().split("\t");
-				if (data[0].equals(this.getUserName())) {
-					return false;
-				}
-			}
-		}
-
-		return true;
+	
+	@Test
+	public void testCreateUser() {
+		UserManager test = new UserManager("testCreateUser", "testing");
+		assertTrue("User Created", test.createUser());
+		assertFalse("User duplicated", test.createUser());
+		test.removeUser();	
+		
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((userPass == null) ? 0 : userPass.hashCode());
-		return result;
+	
+	@Test
+	public void testRemoveUser() {
+		UserManager test = new UserManager("testRemoveUser", "testing");
+		test.createUser();
+		assertTrue("User Not Removed", test.removeUser());
+		assertFalse("User still exists", test.removeUser());	
+		test.removeUser();
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UserManager other = (UserManager) obj;
-		if (userPass == null) {
-			if (other.userPass != null)
-				return false;
-		} else if (!userPass.equals(other.userPass))
-			return false;
-		return true;
-	}
-
-	/**
-	 * METHOD createUser adds username and password to the master.txt file
-	 * 
-	 * @return boolean value of whether the user was created successfully or not
-	 */
-	public boolean createUser() {
-		if (isAvailable()) {
-			try {
-				PrintWriter writer = new PrintWriter(new FileWriter("./src/files/master.txt", true));
-				writer.println(this.getUserName() + "\t" + this.getUserPass());
-				writer.close();
-				return true;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false;
-			}
-		}
-		return false;
-	}
-
-	private String hashPassword(String pass) {
-		String hashedPass = "";
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA-1");
-			byte[] bytes = md.digest(pass.getBytes("UTF-8"));
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < bytes.length; i++) {
-				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-			}
-			hashedPass = sb.toString();
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return hashedPass;
-
-	}
-
-	/**
-	 * METHOD removeUser removes username and password to the master.txt file
-	 * 
-	 * @return boolean value of whether the user was removed successfully or not
-	 */
-	public boolean removeUser() {
-		if (!isAvailable()) {
-			//System.out.println("Is Not Available!");
-			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
-				while (reader.hasNextLine()) {
-					String[] data = reader.nextLine().split("\t");
-					System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
-					if (!data[0].equals(this.getUserName())) {
-						PrintWriter writerTemp = new PrintWriter(new FileWriter("./src/files/temp.txt"));
-						writerTemp.println(data[0] + "\t" + data[1]);
-						writerTemp.close();
-					}
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			try (Scanner readerTemp = new Scanner(UserManager.class.getResourceAsStream("/files/temp.txt"))) {
-					while (readerTemp.hasNextLine()) {
-						String data = readerTemp.nextLine();						
-						PrintWriter writer = new PrintWriter(new FileWriter("./src/files/master.txt"));
-						writer.println(data);
-						writer.close();							
-					}
-					return true;
-					
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}
-		return false;
-	}
-
+	
 }
