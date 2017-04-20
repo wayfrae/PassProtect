@@ -69,7 +69,7 @@ public class UserManager {
 	 *            the userPass to set
 	 */
 	public void setUserPass(String userPass) {
-		this.userPass = userPass;
+		this.userPass = hashPassword(userPass);
 	}
 
 	/**
@@ -92,6 +92,120 @@ public class UserManager {
 		}
 
 		return false;
+	}
+
+	/**
+	 * METHOD createUser adds username and password to the master.txt file
+	 * 
+	 * @return boolean value of whether the user was created successfully or not
+	 */
+	public boolean createUser() {
+		BufferedWriter writer = null;
+		boolean success = false;
+		if (isAvailable()) {
+			try {
+				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", true));
+				writer.write(this.getUserName() + "\t" + this.getUserPass() + "\n");
+				success = true;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			} finally {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		if (success) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * METHOD removeUser removes username and password from the master.txt file
+	 * 
+	 * @return boolean value of whether the user was removed successfully or not
+	 */
+	public boolean removeUser() {
+		BufferedWriter writerTemp = null;
+		BufferedWriter writer = null;
+		if (!isAvailable()) {
+			// System.out.println("Is Not Available!");
+			try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
+				writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
+				while (reader.hasNextLine()) {
+					String[] data = reader.nextLine().split("\t");
+					// System.out.println("Data: " + data[0] + " getUserName():
+					// " + this.getUserName());
+					if (!data[0].equals(this.getUserName())) {
+						writerTemp.write(data[0] + "\t" + data[1] + "\n");
+					}
+
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				try {
+					writerTemp.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			try (Scanner readerTemp = new Scanner(new FileInputStream("./src/files/temp.txt"))) {
+				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", false));
+				while (readerTemp.hasNextLine()) {
+					String line = readerTemp.nextLine();
+					// System.out.println(line);
+					writer.write(line + "\n");
+				}
+				writer.close();
+				return true;
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+		}
+		return false;
+	}
+
+	/**
+	 * METHOD hashPassword hashes the provided string using SHA-1
+	 * 
+	 * @return the hashed string
+	 */
+	private String hashPassword(String pass) {
+		String hashedPass = "";
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			byte[] bytes = md.digest(pass.getBytes("UTF-8"));
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < bytes.length; i++) {
+				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+			}
+			hashedPass = sb.toString();
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return hashedPass;
+
 	}
 
 	/**
@@ -140,113 +254,4 @@ public class UserManager {
 		return true;
 	}
 
-	/**
-	 * METHOD createUser adds username and password to the master.txt file
-	 * 
-	 * @return boolean value of whether the user was created successfully or not
-	 */
-	public boolean createUser() {
-		BufferedWriter writer = null;
-		boolean success = false;
-		if (isAvailable()) {
-			try {
-				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", true));
-				writer.write(this.getUserName() + "\t" + this.getUserPass() + "\n");
-				success = true;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return false;
-			} finally {
-				try {
-					writer.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		if(success){
-			return true;
-		}else{
-		return false;
-		}
-	}
-
-	private String hashPassword(String pass) {
-		String hashedPass = "";
-		try {
-			MessageDigest md = MessageDigest.getInstance("SHA-1");
-			byte[] bytes = md.digest(pass.getBytes("UTF-8"));
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < bytes.length; i++) {
-				sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-			}
-			hashedPass = sb.toString();
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return hashedPass;
-
-	}
-
-	/**
-	 * METHOD removeUser removes username and password to the master.txt file
-	 * 
-	 * @return boolean value of whether the user was removed successfully or not
-	 */
-	public boolean removeUser() {
-		BufferedWriter writerTemp = null;
-		BufferedWriter writer = null;
-		if (!isAvailable()) {
-			//System.out.println("Is Not Available!");
-			try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
-				writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
-				while (reader.hasNextLine()) {
-					String[] data = reader.nextLine().split("\t");
-					System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
-					if (!data[0].equals(this.getUserName())) {
-						writerTemp.write(data[0] + "\t" + data[1] + "\n");
-					}
-
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
-				try {
-					writerTemp.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-			try (Scanner readerTemp = new Scanner(new FileInputStream("./src/files/temp.txt"))) {
-				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", false));
-				while (readerTemp.hasNextLine()) {
-					String line = readerTemp.nextLine();
-					System.out.println(line);
-					writer.write(line + "\n");
-				}
-				writer.close();
-				return true;
-
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
-				try {
-					writer.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		} 
-		return false;
-	}
-
 }
-
