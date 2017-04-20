@@ -1,10 +1,10 @@
 package passProtect;
 
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.BufferedWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,16 +81,16 @@ public class UserManager {
 	 */
 	public boolean validatePassword() {
 		// List<UserManager> masterFile = new LinkedList<>();
-		
-			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
-				while (reader.hasNextLine()) {
-					String[] data = reader.nextLine().split("\t");
-					if (data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())) {
-						return true;
-					}
+
+		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
+			while (reader.hasNextLine()) {
+				String[] data = reader.nextLine().split("\t");
+				if (data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())) {
+					return true;
 				}
 			}
-		
+		}
+
 		return false;
 	}
 
@@ -100,13 +100,16 @@ public class UserManager {
 	 * @return true if the username is available for use
 	 */
 	private boolean isAvailable() {
-		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
+		try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
 			while (reader.hasNextLine()) {
 				String[] data = reader.nextLine().split("\t");
 				if (data[0].equals(this.getUserName())) {
 					return false;
 				}
 			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return true;
@@ -143,19 +146,31 @@ public class UserManager {
 	 * @return boolean value of whether the user was created successfully or not
 	 */
 	public boolean createUser() {
+		BufferedWriter writer = null;
+		boolean success = false;
 		if (isAvailable()) {
 			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter("./src/files/master.txt", true));
-				writer.write(this.getUserName() + "\t" + this.getUserPass());
-				//writer.close();
-				return true;
+				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", true));
+				writer.write(this.getUserName() + "\t" + this.getUserPass() + "\n");
+				success = true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
+			} finally {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
+		if(success){
+			return true;
+		}else{
 		return false;
+		}
 	}
 
 	private String hashPassword(String pass) {
@@ -181,40 +196,57 @@ public class UserManager {
 	 * @return boolean value of whether the user was removed successfully or not
 	 */
 	public boolean removeUser() {
+		BufferedWriter writerTemp = null;
+		BufferedWriter writer = null;
 		if (!isAvailable()) {
 			//System.out.println("Is Not Available!");
-			try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
-				BufferedWriter writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
+			try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
+				writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
 				while (reader.hasNextLine()) {
 					String[] data = reader.nextLine().split("\t");
-					//System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
-					if (!data[0].equals(this.getUserName())) {						
+					System.out.println("Data: " + data[0] + " getUserName(): " + this.getUserName());
+					if (!data[0].equals(this.getUserName())) {
 						writerTemp.write(data[0] + "\t" + data[1] + "\n");
 					}
-					//writerTemp.close();
+
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				try {
+					writerTemp.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			
-			try (Scanner readerTemp = new Scanner(UserManager.class.getResourceAsStream("/files/temp.txt"))) {
-				BufferedWriter writer = new BufferedWriter(new FileWriter("./src/files/master.txt"));
-					while (readerTemp.hasNextLine()) {
-						String line = readerTemp.nextLine();
-						System.out.println(line);
-						writer.write(line + "\n");
-					}
-					writer.close();	
-					return true;
-					
+
+			try (Scanner readerTemp = new Scanner(new FileInputStream("./src/files/temp.txt"))) {
+				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", false));
+				while (readerTemp.hasNextLine()) {
+					String line = readerTemp.nextLine();
+					System.out.println(line);
+					writer.write(line + "\n");
+				}
+				writer.close();
+				return true;
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} finally {
+				try {
+					writer.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			
-		}
+
+		} 
 		return false;
 	}
 
 }
+
