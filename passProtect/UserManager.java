@@ -82,13 +82,16 @@ public class UserManager {
 	public boolean validatePassword() {
 		// List<UserManager> masterFile = new LinkedList<>();
 
-		try (Scanner reader = new Scanner(UserManager.class.getResourceAsStream("/files/master.txt"))) {
+		try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
 			while (reader.hasNextLine()) {
 				String[] data = reader.nextLine().split("\t");
 				if (data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())) {
 					return true;
 				}
 			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		return false;
