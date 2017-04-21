@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +20,12 @@ public class PasswordManager {
 	private List<PasswordRecord> records;
 
 	// File to hold all PasswordRecords
-	private static File passwordFile;
+	private File passwordFile;
 	// Temporary file used in the Remove method
 	private static File tmpFile = new File("./src/files/tmp.txt");
 
-	public PasswordManager(File file) {
-		this.passwordFile = file;
+	public PasswordManager(String filename) {
+		this.passwordFile = new File("./src/files/" + filename + ".pwr");
 		this.records = new ArrayList<PasswordRecord>();
 
 		// Initialize needed vairables
@@ -53,7 +54,7 @@ public class PasswordManager {
 			// Files must be converted into Paths to make use of the Files.copy
 			// method (Very useful)
 			Files.copy(tmpFile.toPath(), passwordFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException | NoSuchFileException e) {
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
