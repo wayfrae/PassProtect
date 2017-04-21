@@ -25,8 +25,9 @@ public class UserManager {
 	 * FIELD userFile holds PasswordManager object for retrieving specific user
 	 * data
 	 */
-	private PasswordManager userFile;
-
+	
+	String master = "./src/files/master.txt";
+	String temp = "./src/files/temp.txt";
 	List<UserManager> masterFile = new LinkedList<>();
 
 	/**
@@ -80,9 +81,8 @@ public class UserManager {
 	 *         in the file.
 	 */
 	public boolean validatePassword() {
-		// List<UserManager> masterFile = new LinkedList<>();
-
-		try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
+		
+		try (Scanner reader = new Scanner(new FileInputStream(master))) {
 			while (reader.hasNextLine()) {
 				String[] data = reader.nextLine().split("\t");
 				if (data[0].equals(this.getUserName()) && data[1].equals(this.getUserPass())) {
@@ -107,7 +107,7 @@ public class UserManager {
 		boolean success = false;
 		if (isAvailable()) {
 			try {
-				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", true));
+				writer = new BufferedWriter(new FileWriter(master, true));
 				writer.write(this.getUserName() + "\t" + this.getUserPass() + "\n");
 				success = true;
 			} catch (IOException e) {
@@ -140,7 +140,7 @@ public class UserManager {
 		BufferedWriter writer = null;
 		if (!isAvailable()) {
 			// System.out.println("Is Not Available!");
-			try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
+			try (Scanner reader = new Scanner(new FileInputStream(master))) {
 				writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
 				while (reader.hasNextLine()) {
 					String[] data = reader.nextLine().split("\t");
@@ -164,7 +164,7 @@ public class UserManager {
 			}
 
 			try (Scanner readerTemp = new Scanner(new FileInputStream("./src/files/temp.txt"))) {
-				writer = new BufferedWriter(new FileWriter("./src/files/master.txt", false));
+				writer = new BufferedWriter(new FileWriter(master, false));
 				while (readerTemp.hasNextLine()) {
 					String line = readerTemp.nextLine();
 					// System.out.println(line);
@@ -217,7 +217,7 @@ public class UserManager {
 	 * @return true if the username is available for use
 	 */
 	private boolean isAvailable() {
-		try (Scanner reader = new Scanner(new FileInputStream("./src/files/master.txt"))) {
+		try (Scanner reader = new Scanner(new FileInputStream(master))) {
 			while (reader.hasNextLine()) {
 				String[] data = reader.nextLine().split("\t");
 				if (data[0].equals(this.getUserName())) {
