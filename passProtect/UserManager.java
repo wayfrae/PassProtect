@@ -1,3 +1,9 @@
+/*
+ * Assignment: Final Project
+ * Class: CSIS-1410-005
+ * Programmers: Alan Banner, Alan Bischoff, Zach Frazier, Tim Lawrence
+ * Created: Apr 6, 2017
+ */
 package passProtect;
 
 import java.io.BufferedWriter;
@@ -6,8 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,15 +24,12 @@ public class UserManager {
 	/** FIELD userName holds the user's login name */
 	private String userName;
 	/** FIELD userPass holds the user's password */
-	private String userPass;
-	/**
-	 * FIELD userFile holds PasswordManager object for retrieving specific user
-	 * data
-	 */
+	private String userPass;	
+	/** FIELD master holds the path to the master file */
+	private String master = "./src/files/master.txt";
+	/** FIELD temp holds the path to the temp file */
+	private String temp = "./src/files/temp.txt";
 	
-	String master = "./src/files/master.txt";
-	String temp = "./src/files/temp.txt";
-	List<UserManager> masterFile = new LinkedList<>();
 
 	/**
 	 * CONSTRUCTOR UserManager Logs the user into the UserManager if the
@@ -40,6 +41,7 @@ public class UserManager {
 	public UserManager(String user, String pass) {
 		this.userName = user;
 		this.userPass = hashPassword(pass);
+		
 
 	}
 
@@ -71,6 +73,8 @@ public class UserManager {
 	 */
 	public void setUserPass(String userPass) {
 		this.userPass = hashPassword(userPass);
+		this.removeUser();
+		this.createUser();
 	}
 
 	/**
@@ -141,7 +145,7 @@ public class UserManager {
 		if (!isAvailable()) {
 			// System.out.println("Is Not Available!");
 			try (Scanner reader = new Scanner(new FileInputStream(master))) {
-				writerTemp = new BufferedWriter(new FileWriter("./src/files/temp.txt"));
+				writerTemp = new BufferedWriter(new FileWriter(temp));
 				while (reader.hasNextLine()) {
 					String[] data = reader.nextLine().split("\t");
 					// System.out.println("Data: " + data[0] + " getUserName():
@@ -163,7 +167,7 @@ public class UserManager {
 				}
 			}
 
-			try (Scanner readerTemp = new Scanner(new FileInputStream("./src/files/temp.txt"))) {
+			try (Scanner readerTemp = new Scanner(new FileInputStream(temp))) {
 				writer = new BufferedWriter(new FileWriter(master, false));
 				while (readerTemp.hasNextLine()) {
 					String line = readerTemp.nextLine();
