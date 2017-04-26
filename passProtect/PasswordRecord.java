@@ -1,12 +1,10 @@
 /*
- * Assignment: PassProtect
+ * Assignment: Final Project
  * Class: CSIS-1410-005
- * Programmer: Zach Frazier
+ * Programmers: Alan Banner, Alan Bischoff, Zach Frazier, Tim Lawrence
  * Created: Apr 6, 2017
  */
 package passProtect;
-
-import java.io.File;
 
 /** CLASS PasswordRecord
  *  Creates and stores usernames and passwords for each domain listed.
@@ -14,7 +12,6 @@ import java.io.File;
 public class PasswordRecord {
 	
 	private String domain, username, password;
-	private File userFile;
 	
 	/**
 	 * CONSTRUCTOR PasswordRecord
@@ -52,12 +49,35 @@ public class PasswordRecord {
 		this.password = password;
 	}
 
-	public File getUserFile() {
-		return userFile;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((domain == null) ? 0 : domain.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
+		return result;
 	}
 
-	public void setUserFile(File userFile) {
-		this.userFile = userFile;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PasswordRecord other = (PasswordRecord) obj;
+		if (domain == null) {
+			if (other.domain != null)
+				return false;
+		} else if (!domain.equals(other.domain))
+			return false;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
 	}
 	
 	
