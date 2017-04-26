@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
 
 @SuppressWarnings("serial")
 public class PassProtectApp extends JFrame {
@@ -61,6 +62,7 @@ public class PassProtectApp extends JFrame {
 
 	private JPanel createPanelLogin() {
 		JPanel panelLogin = new JPanel();
+		panelLogin.setBackground(new Color(255, 255, 255));
 		panelLogin.setLayout(null);
 
 		JLabel lblPassprotect = new JLabel("PassProtect");
@@ -78,16 +80,20 @@ public class PassProtectApp extends JFrame {
 		panelLogin.add(lblPassword);
 
 		txtUsername = new JTextField();
+		txtUsername.setBackground(new Color(135, 206, 250));
 		txtUsername.setBounds(225, 193, 254, 20);
 		panelLogin.add(txtUsername);
 		txtUsername.setColumns(10);
 
 		txtPassword = new JPasswordField();
+		txtPassword.setBackground(new Color(135, 206, 250));
 		txtPassword.setColumns(10);
 		txtPassword.setBounds(225, 219, 254, 20);
 		panelLogin.add(txtPassword);
 
 		JButton btnNewButton = new JButton("Log In");
+		btnNewButton.setBackground(new Color(255, 255, 255));
+		btnNewButton.setForeground(new Color(0, 0, 0));
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				UserManager user = new UserManager(txtUsername.getText(), txtPassword.getText());
@@ -121,11 +127,18 @@ public class PassProtectApp extends JFrame {
 		lblErrorMessage.setForeground(Color.RED);
 		lblErrorMessage.setBounds(225, 282, 254, 32);
 		panelLogin.add(lblErrorMessage);
+		
+		JLabel lblImage = new JLabel("");
+		lblImage.setOpaque(true);
+		lblImage.setIcon(new ImageIcon(PassProtectApp.class.getResource("/passProtect/PassLogo1.png")));
+		lblImage.setBounds(29, 62, 108, 110);
+		panelLogin.add(lblImage);
 		return panelLogin;
 	}
 
 	private JPanel createPanelNewUser() {
 		JPanel panelNewUser = new JPanel();
+		panelNewUser.setBackground(new Color(255, 255, 255));
 		panelNewUser.setLayout(null);
 
 		JLabel lblPassprotect = new JLabel("Create Account");
@@ -143,11 +156,13 @@ public class PassProtectApp extends JFrame {
 		panelNewUser.add(lblPassword);
 
 		txtUsername = new JTextField();
+		txtUsername.setBackground(new Color(135, 206, 250));
 		txtUsername.setBounds(225, 193, 254, 20);
 		panelNewUser.add(txtUsername);
 		txtUsername.setColumns(10);
 
 		txtPassword = new JPasswordField();
+		txtPassword.setBackground(new Color(135, 206, 250));
 		txtPassword.setColumns(10);
 		txtPassword.setBounds(225, 219, 254, 20);
 		panelNewUser.add(txtPassword);
@@ -189,6 +204,7 @@ public class PassProtectApp extends JFrame {
 		panelNewUser.add(lblConfirmPassword);
 
 		txtConfirm = new JPasswordField();
+		txtConfirm.setBackground(new Color(135, 206, 250));
 		txtConfirm.setColumns(10);
 		txtConfirm.setBounds(225, 246, 254, 20);
 		panelNewUser.add(txtConfirm);
@@ -211,14 +227,19 @@ public class PassProtectApp extends JFrame {
 				panelMain.repaint();
 			}
 		});
-		btnGoBack.setForeground(Color.BLUE);
-		btnGoBack.setBounds(145, 88, 150, 23);
+		btnGoBack.setForeground(new Color(139, 0, 0));
+		btnGoBack.setBounds(238, 57, 150, 23);
 		btnGoBack.setFocusPainted(false);
 		btnGoBack.setMargin(new Insets(0, 0, 0, 0));
 		btnGoBack.setContentAreaFilled(false);
 		btnGoBack.setBorderPainted(false);
 		btnGoBack.setOpaque(false);
 		panelNewUser.add(btnGoBack);
+		
+		JLabel label = new JLabel("");
+		label.setIcon(new ImageIcon(PassProtectApp.class.getResource("/passProtect/PassLogo1.png")));
+		label.setBounds(24, 55, 114, 115);
+		panelNewUser.add(label);
 		return panelNewUser;
 	}
 }
