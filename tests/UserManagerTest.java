@@ -26,8 +26,8 @@ public class UserManagerTest {
 		test2.createUser();
 		assertFalse(test2.validatePassword());
 		
-		test.removeUser();
-		
+		//test.removeUser();
+		//test2.removeUser();
 	}
 	
 	@Test
@@ -35,8 +35,7 @@ public class UserManagerTest {
 		UserManager test = new UserManager("testCreateUser", "testing");
 		assertTrue("User Not Created", test.createUser());
 		assertFalse("User duplicated", test.createUser());
-		test.removeUser();	
-		
+		test.removeUser();		
 	}
 	
 	@Test
@@ -44,8 +43,7 @@ public class UserManagerTest {
 		UserManager test = new UserManager("testRemoveUser", "testing");
 		test.createUser();
 		assertTrue("User Not Removed", test.removeUser());
-		assertFalse("User should not be found.", test.removeUser());	
-		
+		assertFalse("User should not be found.", test.removeUser());		
 	}
 	
 }
