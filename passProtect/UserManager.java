@@ -4,6 +4,7 @@
  * Programmers: Alan Banner, Alan Bischoff, Zach Frazier, Tim Lawrence
  * Created: Apr 6, 2017
  */
+
 package passProtect;
 
 import java.io.BufferedWriter;
